@@ -8,6 +8,16 @@
 import SwiftUI
 @_spi(LiveForm) import LiveViewNative
 
+/// A button that submits a live form.
+///
+/// Use the same customization options as ``LiveViewNative.Button``.
+///
+/// ## Attributes
+/// - `after-submit`: An action to perform after the form is submitted. Supported actions:
+///     - `clear`: clears all values from the form
+#if swift(>=5.8)
+@_documentation(visibility: public)
+#endif
 struct LiveSubmitButton<R: RootRegistry>: View {
     @ObservedElement private var element: ElementNode
     @LiveContext<R> private var context

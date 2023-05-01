@@ -30,12 +30,12 @@ public struct LiveFormRegistry<Root: RootRegistry>: CustomRegistry {
         case liveSubmitButton = "live-submit-button"
     }
     
-    public static func lookup(_ name: TagName, element: ElementNode, context: LiveContext<Root>) -> some View {
+    public static func lookup(_ name: TagName, element: ElementNode) -> some View {
         switch name {
         case .liveForm:
-            LiveForm<Root>(context: context)
+            LiveForm<Root>()
         case .liveSubmitButton:
-            LiveSubmitButton<Root>(context: context)
+            LiveSubmitButton<Root>()
         }
     }
 }

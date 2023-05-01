@@ -10,7 +10,7 @@ import SwiftUI
 
 struct LiveForm<R: RootRegistry>: View {
     @ObservedElement private var element: ElementNode
-    private let context: LiveContext<R>
+    @LiveContext<R> private var context
     
     @EnvironmentObject private var liveViewModel: LiveViewModel
     
@@ -21,12 +21,8 @@ struct LiveForm<R: RootRegistry>: View {
         return liveViewModel.getForm(elementID: id)
     }
     
-    init(context: LiveContext<R>) {
-        self.context = context
-    }
-    
     public var body: some View {
-        context.with(formModel: formModel).buildChildren(of: element)
+        context.buildChildren(of: element)
             .environment(\.formModel, formModel)
             .onAppear {
                 formModel.pushEventImpl = context.coordinator.pushEvent

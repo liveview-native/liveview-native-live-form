@@ -10,15 +10,11 @@ import SwiftUI
 
 struct LiveSubmitButton<R: RootRegistry>: View {
     @ObservedElement private var element: ElementNode
-    private let context: LiveContext<R>
+    @LiveContext<R> private var context
     @Environment(\.formModel) private var formModel
     
-    init(context: LiveContext<R>) {
-        self.context = context
-    }
-    
     public var body: some View {
-        LiveViewNative.Button(element: element, context: context, action: submitForm)
+        LiveViewNative.Button<R>(action: submitForm)
     }
     
     private func submitForm() {

@@ -27,6 +27,7 @@ let package = Package(
             name: "LiveViewNativeLiveForm",
             dependencies: [
                 .product(name: "LiveViewNative", package: "liveview-client-swiftui")
-            ]),
+            ],
+            path: "./swiftui"),
     ]
 )

@@ -3,7 +3,7 @@
     {
       "identity" : "liveview-client-swiftui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/liveviewnative/liveview-client-swiftui.git",
+      "location" : "https://github.com/liveview-native/liveview-client-swiftui.git",
       "state" : {
         "branch" : "main",
         "revision" : "ee374177ed6d9e033b538498ed33aa06e512e2c9"
@@ -12,7 +12,7 @@
     {
       "identity" : "liveview-native-core-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/liveviewnative/liveview-native-core-swift.git",
+      "location" : "https://github.com/liveview-native/liveview-native-core-swift.git",
       "state" : {
         "branch" : "main",
         "revision" : "ffea1b5ff768fd2eeea5d4bdfae606b18517f880"

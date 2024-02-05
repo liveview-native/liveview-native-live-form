@@ -50,7 +50,7 @@ defmodule AppWeb.FormLive do
   def render(%{format: :swiftui} = assigns) do
     ~SWIFTUI"""
     <LiveForm id="my-form" phx-submit="submit">
-      <TextField name="my-text" >Placeholder</TextField>
+      <TextField name="my-text">Placeholder</TextField>
       <LiveSubmitButton>Submit</LiveSubmitButton>
     </LiveForm>
     """

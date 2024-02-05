@@ -2,7 +2,7 @@
 
 ## About
 
-`liveview-native-forms` is an add-on library for [LiveView Native SwiftUI](https://github.com/liveviewnative/liveview-client-swiftui). It adds support for conveniently working with control views grouped within a single form so you can use Phoenix [Form Bindings](https://hexdocs.pm/phoenix_live_view/form-bindings.html) within a LiveView Native application.
+`liveview-native-live-form` is an add-on library for [LiveView Native SwiftUI](https://github.com/liveviewnative/liveview-client-swiftui). It adds support for conveniently working with control views grouped within a single form so you can use Phoenix [Form Bindings](https://hexdocs.pm/phoenix_live_view/form-bindings.html) within a LiveView Native application.
 
 ## Installation
 

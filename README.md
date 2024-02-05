@@ -18,11 +18,6 @@
 import `LiveViewNativeLiveForm` and add the `LiveFormRegistry` to the `addons` list of your `#LiveView`.
 
 ```swift
-//
-//  ContentView.swift
-//  KinoLiveView
-//
-
 import SwiftUI
 import LiveViewNative
 import LiveViewNativeLiveForm

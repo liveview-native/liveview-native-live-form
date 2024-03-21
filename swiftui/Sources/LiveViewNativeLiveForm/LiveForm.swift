@@ -41,9 +41,11 @@ struct LiveForm<R: RootRegistry>: View {
             .task {
                 formModel.pushEventImpl = context.coordinator.pushEvent
                 formModel.updateFromElement(element, submitAction: submitForm)
+                updateHiddenFields()
             }
             .onReceive($element) {
                 formModel.updateFromElement(element, submitAction: submitForm)
+                updateHiddenFields()
             }
             .onChange(of: element.attributeBoolean(for: "phx-trigger-action")) {
                 guard $0 else { return }
@@ -61,6 +63,18 @@ struct LiveForm<R: RootRegistry>: View {
                 httpMethod: method,
                 httpBody: body.data(using: .utf8)
             )
+        }
+    }
+    
+    /// Collects all ``LiveHiddenField`` elements, and sets their values into the form model.
+    private func updateHiddenFields() {
+        for child in element.depthFirstChildren() {
+            guard case let .element(element) = child.data,
+                  element.tag == "LiveHiddenField",
+                  let name = element.attributes.first(where: { $0.name == "name" })?.value,
+                  let value = element.attributes.first(where: { $0.name == "value" })?.value
+            else { continue }
+            self.formModel[name] = value
         }
     }
 }

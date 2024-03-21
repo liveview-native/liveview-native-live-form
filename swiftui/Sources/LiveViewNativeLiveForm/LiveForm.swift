@@ -49,7 +49,6 @@ struct LiveForm<R: RootRegistry>: View {
                 guard $0 else { return }
                 submitForm()
             }
-            .id(element.attributeValue(for: "id"))
     }
     
     private func submitForm() {

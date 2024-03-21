@@ -27,6 +27,7 @@ public struct LiveFormRegistry<Root: RootRegistry>: CustomRegistry {
     public enum TagName: String {
         case liveForm = "LiveForm"
         case liveSubmitButton = "LiveSubmitButton"
+        case liveHiddenField = "LiveHiddenField"
     }
     
     public static func lookup(_ name: TagName, element: ElementNode) -> some View {
@@ -35,6 +36,8 @@ public struct LiveFormRegistry<Root: RootRegistry>: CustomRegistry {
             LiveForm<Root>()
         case .liveSubmitButton:
             LiveSubmitButton<Root>()
+        case .liveHiddenField:
+            LiveHiddenField()
         }
     }
 }

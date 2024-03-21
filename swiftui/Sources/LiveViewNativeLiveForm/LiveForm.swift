@@ -24,6 +24,10 @@ struct LiveForm<R: RootRegistry>: View {
     
     @EnvironmentObject private var liveViewModel: LiveViewModel
     
+    @Attribute("phx-trigger-action") private var triggerAction: Bool
+    @Attribute("action") private var action: String
+    @Attribute("method") private var method: String
+    
     private var formModel: FormModel {
         guard let id = element.attributeValue(for: "id") else {
             fatalError("<LiveForm> must have an id")
@@ -34,12 +38,30 @@ struct LiveForm<R: RootRegistry>: View {
     public var body: some View {
         context.buildChildren(of: element)
             .environment(\.formModel, formModel)
-            .onAppear {
+            .task {
                 formModel.pushEventImpl = context.coordinator.pushEvent
-                formModel.updateFromElement(element)
+                formModel.updateFromElement(element, submitAction: submitForm)
             }
             .onReceive($element) {
-                formModel.updateFromElement(element)
+                formModel.updateFromElement(element, submitAction: submitForm)
             }
+            .onChange(of: element.attributeBoolean(for: "phx-trigger-action")) {
+                guard $0 else { return }
+                submitForm()
+            }
+            .id(element.attributeValue(for: "id"))
+    }
+    
+    private func submitForm() {
+        guard let url = URL(string: action, relativeTo: context.url),
+              let body = try? formModel.buildFormQuery()
+        else { return }
+        Task {
+            await context.coordinator.session.reconnect(
+                url: url,
+                httpMethod: method,
+                httpBody: body.data(using: .utf8)
+            )
+        }
     }
 }

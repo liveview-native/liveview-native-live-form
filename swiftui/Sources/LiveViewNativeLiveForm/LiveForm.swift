@@ -18,47 +18,49 @@ import SwiftUI
 #if swift(>=5.8)
 @_documentation(visibility: public)
 #endif
-struct LiveForm<R: RootRegistry>: View {
-    @ObservedElement private var element: ElementNode
-    @LiveContext<R> private var context
-    
+@LiveElement
+struct LiveForm<Root: RootRegistry>: View {
+    @LiveElementIgnored
     @EnvironmentObject private var liveViewModel: LiveViewModel
     
-    @Attribute("phx-trigger-action") private var triggerAction: Bool
-    @Attribute("action") private var action: String
-    @Attribute("method") private var method: String
+    @LiveAttribute("phx-trigger-action") private var triggerAction: Bool = false
+    private var action: String?
+    private var method: String = "POST"
+    
+    private var id: String?
     
     private var formModel: FormModel {
-        guard let id = element.attributeValue(for: "id") else {
+        guard let id else {
             fatalError("<LiveForm> must have an id")
         }
         return liveViewModel.getForm(elementID: id)
     }
     
     public var body: some View {
-        context.buildChildren(of: element)
+        $liveElement.children()
             .environment(\.formModel, formModel)
             .task {
-                formModel.pushEventImpl = context.coordinator.pushEvent
-                formModel.updateFromElement(element, submitAction: submitForm)
+                formModel.pushEventImpl = $liveElement.context.coordinator.pushEvent
+                formModel.updateFromElement($liveElement.element, submitAction: submitForm)
                 updateHiddenFields()
             }
-            .onReceive($element) {
-                formModel.updateFromElement(element, submitAction: submitForm)
+            .onReceive($liveElement.$element) {
+                formModel.updateFromElement($liveElement.element, submitAction: submitForm)
                 updateHiddenFields()
             }
-            .onChange(of: element.attributeBoolean(for: "phx-trigger-action")) {
+            .onChange(of: triggerAction) {
                 guard $0 else { return }
                 submitForm()
             }
     }
     
     private func submitForm() {
-        guard let url = URL(string: action, relativeTo: context.url),
+        guard let action,
+              let url = URL(string: action, relativeTo: $liveElement.context.url),
               let body = try? formModel.buildFormQuery()
         else { return }
         Task {
-            await context.coordinator.session.reconnect(
+            await $liveElement.context.coordinator.session.reconnect(
                 url: url,
                 httpMethod: method,
                 httpBody: body.data(using: .utf8)
@@ -68,7 +70,7 @@ struct LiveForm<R: RootRegistry>: View {
     
     /// Collects all ``LiveHiddenField`` elements, and sets their values into the form model.
     private func updateHiddenFields() {
-        for child in element.depthFirstChildren() {
+        for child in $liveElement.element.depthFirstChildren() {
             guard case let .element(element) = child.data,
                   element.tag == "LiveHiddenField",
                   let name = element.attributes.first(where: { $0.name == "name" })?.value,

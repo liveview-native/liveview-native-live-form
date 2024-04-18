@@ -55,8 +55,7 @@ defmodule LiveViewNative.LiveForm.MixProject do
     %{
       maintainers: ["Brian Cardarella"],
       licenses: ["MIT"],
-      files: ~w(elixir priv .formatter.exs mix.exs README* readme* LICENSE* license*
-      CHANGELOG* changelog* src c_src Makefile*),
+      files: ~w(elixir/lib  mix.exs README* LICENSE* CHANGELOG*),
       links: %{
         "GitHub" => @source_url,
         "Built by DockYard, Expert Elixir & Phoenix Consultants" => "https://dockyard.com/phoenix-consulting"

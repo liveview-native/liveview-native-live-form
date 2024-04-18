@@ -120,3 +120,4 @@ live_view_native_swiftui-*.tar
 
 # Temporary files, for example, from tests.
 /elixir/tmp/
+doc/

@@ -1,6 +1,20 @@
 defmodule LiveViewNative.LiveForm.Component do
+  @moduledoc """
+  Base components for LiveForm
+  """
   use LiveViewNative.Component
 
+  @doc """
+  Renders a form.
+
+  This form component behaves identital to `Phoenix.Component.form/1`. Please
+  refer to that docmentation for usage details. on arguments. This component
+  is platform agnostic. The `<LiveForm>` element will be implemented in all
+  supported clients. Third-party clients can also implement their own `<LiveForm>`
+  element and take advantage of this component.
+
+  [INSERT LVATTRDOCS]
+  """
   @doc type: :component
   attr(:for, :any, required: true, doc: "An existing form or the form source data.")
 

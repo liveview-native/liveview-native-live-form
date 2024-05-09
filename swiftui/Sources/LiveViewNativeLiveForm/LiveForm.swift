@@ -76,7 +76,7 @@ struct LiveForm<Root: RootRegistry>: View {
                   let name = element.attributes.first(where: { $0.name == "name" })?.value,
                   let value = element.attributes.first(where: { $0.name == "value" })?.value
             else { continue }
-            self.formModel[name] = value
+            self.formModel.setValue(value, forName: name, changeEvent: nil)
         }
     }
 }

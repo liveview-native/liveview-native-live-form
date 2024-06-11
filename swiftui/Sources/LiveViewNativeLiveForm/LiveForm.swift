@@ -44,7 +44,7 @@ struct LiveForm<Root: RootRegistry>: View {
                 formModel.updateFromElement($liveElement.element, submitAction: submitForm)
                 updateHiddenFields()
             }
-            .onReceive($liveElement.$element) {
+            .onReceive($liveElement.$element) { _ in
                 formModel.updateFromElement($liveElement.element, submitAction: submitForm)
                 updateHiddenFields()
             }

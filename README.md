@@ -4,6 +4,21 @@
 
 ## Installation
 
+### Elixir
+
+If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+by adding `live_view_native_live_form` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:live_view_native_live_form, "~> 0.3.0"}
+  ]
+end
+```
+
+### SwiftUI
+
 1. In Xcode, select *File → Add Packages...*
 2. Enter the package URL `https://github.com/liveview-native/liveview-native-live-form`
 3. Select *Add Package*

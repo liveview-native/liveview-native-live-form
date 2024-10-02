@@ -113,7 +113,7 @@ defmodule LiveViewNative.LiveForm.Component do
         {true, attrs} -> Keyword.put(attrs, :enctype, "multipart/form-data")
       end
 
-    attrs = Keyword.put(attrs, :id, Map.get(assigns.rest, :id, form_for.id))
+    attrs = Keyword.put(attrs, :id, Map.get_lazy(assigns.rest, :id, fn -> form_for.id end))
 
     assigns =
       assign(assigns,

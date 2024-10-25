@@ -4,6 +4,8 @@ defmodule LiveViewNative.LiveForm.Component do
   """
   use LiveViewNative.Component
 
+  defdelegate to_form(data_or_params, options \\ []), to: Phoenix.Component
+
   @doc """
   Renders a form.
 
@@ -77,6 +79,51 @@ defmodule LiveViewNative.LiveForm.Component do
   slot(:inner_block, required: true, doc: "The content rendered inside of the form tag.")
 
   def form(assigns) do
+    # action = assigns[:action]
+
+    # # We require for={...} to be given but we automatically handle nils for convenience
+    # form_for =
+    #   case assigns[:for] do
+    #     nil -> %{}
+    #     other -> other
+    #   end
+
+    # form_options =
+    #   assigns
+    #   |> Map.take([:as, :csrf_token, :errors, :method, :multipart])
+    #   |> Map.merge(assigns.rest)
+    #   |> Map.to_list()
+
+    # # Since FormData may add options, read the actual options from form
+    # %{options: opts} = form = to_form(form_for, form_options)
+
+    # # By default, we will ignore action, method, and csrf token
+    # # unless the action is given.
+    # attrs =
+    #   if action do
+    #     {method, opts} = Keyword.pop(opts, :method)
+    #     {method, _} = form_method(method)
+
+    #     [action: action, method: method] ++ opts
+    #   else
+    #     opts
+    #   end
+
+    # attrs =
+    #   case Keyword.pop(attrs, :multipart, false) do
+    #     {false, attrs} -> attrs
+    #     {true, attrs} -> Keyword.put(attrs, :enctype, "multipart/form-data")
+    #   end
+
+    # require IEx
+    # IEx.pry()
+    # attrs = Keyword.put(attrs, :id, Map.get_lazy(assigns.rest, :id, fn -> form_for.id end))
+
+    # assigns =
+    #   assign(assigns,
+    #     form: form,
+    #     attrs: attrs
+    #   )
     action = assigns[:action]
 
     # We require for={...} to be given but we automatically handle nils for convenience
@@ -97,14 +144,21 @@ defmodule LiveViewNative.LiveForm.Component do
 
     # By default, we will ignore action, method, and csrf token
     # unless the action is given.
-    attrs =
+    {attrs, hidden_method, csrf_token} =
       if action do
         {method, opts} = Keyword.pop(opts, :method)
-        {method, _} = form_method(method)
+        {method, hidden_method} = form_method(method)
 
-        [action: action, method: method] ++ opts
+        {csrf_token, opts} =
+          Keyword.pop_lazy(opts, :csrf_token, fn ->
+            if method == "post" do
+              Plug.CSRFProtection.get_csrf_token_for(action)
+            end
+          end)
+
+        {[action: action, method: method] ++ opts, hidden_method, csrf_token}
       else
-        opts
+        {opts, nil, nil}
       end
 
     attrs =
@@ -113,16 +167,22 @@ defmodule LiveViewNative.LiveForm.Component do
         {true, attrs} -> Keyword.put(attrs, :enctype, "multipart/form-data")
       end
 
-    attrs = Keyword.put(attrs, :id, Map.get_lazy(assigns.rest, :id, fn -> form_for.id end))
-
     assigns =
       assign(assigns,
         form: form,
+        csrf_token: csrf_token,
+        hidden_method: hidden_method,
         attrs: attrs
       )
 
     ~LVN"""
     <LiveForm {@attrs}>
+      <%= if @hidden_method && @hidden_method not in ~w(get post) do %>
+        <LiveHiddenField name="_method" value={@hidden_method} />
+      <% end %>
+      <%= if @csrf_token do %>
+        <LiveHiddenField name="_csrf_token" value={@csrf_token} />
+      <% end %>
       <%= render_slot(@inner_block, @form) %>
     </LiveForm>
     """
@@ -131,4 +191,260 @@ defmodule LiveViewNative.LiveForm.Component do
   defp form_method(nil), do: {"post", nil}
   defp form_method(method) when method in ~w(get post), do: {method, nil}
   defp form_method(method) when is_binary(method), do: {"post", method}
+
+  @doc """
+  Renders nested form inputs for associations or embeds.
+
+  [INSERT LVATTRDOCS]
+
+  ## Examples
+
+  ```heex
+  <.form
+    :let={f}
+    phx-change="change_name"
+  >
+    <.inputs_for :let={f_nested} field={f[:nested]}>
+      <.input type="text" field={f_nested[:name]} />
+    </.inputs_for>
+  </.form>
+  ```
+
+  ## Dynamically adding and removing inputs
+
+  Dynamically adding and removing inputs is supported by rendering named buttons for
+  inserts and removals. Like inputs, buttons with name/value pairs are serialized with
+  form data on change and submit events. Libraries such as Ecto, or custom param
+  filtering can then inspect the parameters and handle the added or removed fields.
+  This can be combined with `Ecto.Changeset.cast/3`'s `:sort_param` and `:drop_param`
+  options. For example, imagine a parent with an `:emails` `has_many` or `embeds_many`
+  association. To cast the user input from a nested form, one simply needs to configure
+  the options:
+
+      schema "mailing_lists" do
+        field :title, :string
+
+        embeds_many :emails, EmailNotification, on_replace: :delete do
+          field :email, :string
+          field :name, :string
+        end
+      end
+
+      def changeset(list, attrs) do
+        list
+        |> cast(attrs, [:title])
+        |> cast_embed(:emails,
+          with: &email_changeset/2,
+          sort_param: :emails_sort,
+          drop_param: :emails_drop
+        )
+      end
+
+  Here we see the `:sort_param` and `:drop_param` options in action.
+
+  > Note: `on_replace: :delete` on the `has_many` and `embeds_many` is required
+  > when using these options.
+
+  When Ecto sees the specified sort or drop parameter from the form, it will sort
+  the children based on the order they appear in the form, add new children it hasn't
+  seen, or drop children if the parameter instructs it to do so.
+
+  The markup for such a schema and association would look like this in SwiftUI:
+
+  ```heex
+  <.inputs_for :let={ef} field={@form[:emails]}>
+    <LiveHiddenField name="mailing_list[emails_sort][]" value={ef.index} />
+    <.input type="text" field={ef[:email]} placeholder="email" />
+    <.input type="text" field={ef[:name]} placeholder="name" />
+    <LiveButton
+      type="submit"
+      name="mailing_list[emails_drop][]"
+      value={ef.index}
+      phx-click={Native.dispatch("change")}
+    >
+      <.icon name="hero-x-mark" class="w-6 h-6 relative top-2" />
+    </LiveButton>
+  </.inputs_for>
+
+  <LiveHiddenField name="mailing_list[emails_drop][]" />
+
+  <Button name="mailing_list[emails_sort][]" value="new" phx-click={Native.dispatch("change")}>
+    add more
+  </Button>
+  ```
+
+  We used `inputs_for` to render inputs for the `:emails` association, which
+  contains an email address and name input for each child. Within the nested inputs,
+  we render a hidden `mailing_list[emails_sort][]` input, which is set to the index of the
+  given child. This tells Ecto's cast operation how to sort existing children, or
+  where to insert new children. Next, we render the email and name inputs as usual.
+  Then we render a button containing the "delete" text with the name `mailing_list[emails_drop][]`,
+  containing the index of the child as its value.
+
+  Like before, this tells Ecto to delete the child at this index when the button is
+  clicked. We use `phx-click={Native.dispatch("change")}` on the button to tell LiveView
+  to treat this button click as a change event, rather than a submit event on the form,
+  which invokes our form's `phx-change` binding.
+
+  Outside the `inputs_for`, we render an empty `mailing_list[emails_drop][]` input,
+  to ensure that all children are deleted when saving a form where the user
+  dropped all entries. This hidden input is required whenever dropping associations.
+
+  Finally, we also render another button with the sort param name `mailing_list[emails_sort][]`
+  and `value="new"` name with accompanied "add more" text. Please note that this button must
+  have `type="button"` to prevent it from submitting the form.
+  Ecto will treat unknown sort params as new children and build a new child.
+  This button is optional and only necessary if you want to dyamically add entries.
+  You can optionally add a similar button before the `<.inputs_for>`, in the case you want
+  to prepend entries.
+  """
+  @doc type: :component
+  attr(:field, Phoenix.HTML.FormField,
+    required: true,
+    doc: "A %Phoenix.HTML.Form{}/field name tuple, for example: {@form[:email]}."
+  )
+
+  attr(:id, :string,
+    doc: """
+    The id to be used in the form, defaults to the concatenation of the given
+    field to the parent form id.
+    """
+  )
+
+  attr(:as, :atom,
+    doc: """
+    The name to be used in the form, defaults to the concatenation of the given
+    field to the parent form name.
+    """
+  )
+
+  attr(:default, :any, doc: "The value to use if none is available.")
+
+  attr(:prepend, :list,
+    doc: """
+    The values to prepend when rendering. This only applies if the field value
+    is a list and no parameters were sent through the form.
+    """
+  )
+
+  attr(:append, :list,
+    doc: """
+    The values to append when rendering. This only applies if the field value
+    is a list and no parameters were sent through the form.
+    """
+  )
+
+  attr(:skip_hidden, :boolean,
+    default: false,
+    doc: """
+    Skip the automatic rendering of hidden fields to allow for more tight control
+    over the generated markup.
+    """
+  )
+
+  attr(:options, :list,
+    default: [],
+    doc: """
+    Any additional options for the `Phoenix.HTML.FormData` protocol
+    implementation.
+    """
+  )
+
+  slot(:inner_block, required: true, doc: "The content rendered for each nested form.")
+
+  @persistent_id "_persistent_id"
+  def inputs_for(assigns) do
+    %Phoenix.HTML.FormField{field: field_name, form: parent_form} = assigns.field
+    options = assigns |> Map.take([:id, :as, :default, :append, :prepend]) |> Keyword.new()
+
+    options =
+      parent_form.options
+      |> Keyword.take([:multipart])
+      |> Keyword.merge(options)
+      |> Keyword.merge(assigns.options)
+
+    forms = parent_form.impl.to_form(parent_form.source, parent_form, field_name, options)
+    seen_ids = for f <- forms, vid = f.params[@persistent_id], into: %{}, do: {vid, true}
+    acc = {seen_ids, 0}
+
+    {forms, _} =
+      Enum.map_reduce(forms, acc, fn
+        %Phoenix.HTML.Form{params: params} = form, {seen_ids, index} ->
+          id =
+            case params do
+              %{@persistent_id => id} -> id
+              %{} -> next_id(map_size(seen_ids), seen_ids)
+            end
+
+          form_id = "#{parent_form.id}_#{field_name}_#{id}"
+          new_params = Map.put(params, @persistent_id, id)
+          new_hidden = [{@persistent_id, id} | form.hidden]
+
+          new_form = %Phoenix.HTML.Form{
+            form
+            | id: form_id,
+              params: new_params,
+              hidden: new_hidden,
+              index: index
+          }
+
+          {new_form, {Map.put(seen_ids, id, true), index + 1}}
+      end)
+
+    assigns = assign(assigns, :forms, forms)
+
+    ~LVN"""
+    <%= for form <- @forms do %>
+      <%= unless @skip_hidden do %>
+        <%= for {name, value_or_values} <- form.hidden,
+                name = name_for_value_or_values(form, name, value_or_values),
+                value <- List.wrap(value_or_values) do %>
+          <LiveHiddenField name={name} value={value} />
+        <% end %>
+      <% end %>
+      <%= render_slot(@inner_block, form) %>
+    <% end %>
+    """
+  end
+
+  defp name_for_value_or_values(form, field, values) when is_list(values) do
+    Phoenix.HTML.Form.input_name(form, field) <> "[]"
+  end
+
+  defp name_for_value_or_values(form, field, _value) do
+    Phoenix.HTML.Form.input_name(form, field)
+  end
+
+  defp next_id(idx, %{} = seen_ids) do
+    id_str = to_string(idx)
+
+    if Map.has_key?(seen_ids, id_str) do
+      next_id(idx + 1, seen_ids)
+    else
+      id_str
+    end
+  end
+
+  @doc """
+  Checks if the input field was used by the client.
+
+  This function conforms exactly the same as `Phoenix.Component.used_input?/1`
+  """
+  def used_input?(%Phoenix.HTML.FormField{field: field, form: form}) do
+    used_param?(form.params, field)
+  end
+
+  defp used_param?(_params, "_unused_" <> _), do: false
+
+  defp used_param?(params, field) do
+    field_str = "#{field}"
+    unused_field_str = "_unused_#{field}"
+
+    case params do
+      %{^field_str => _, ^unused_field_str => _} -> false
+      %{^field_str => %{} = nested} -> Enum.any?(Map.keys(nested), &used_param?(nested, &1))
+      %{^field_str => _val} -> true
+      %{} -> false
+    end
+  end
 end

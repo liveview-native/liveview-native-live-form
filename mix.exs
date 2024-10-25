@@ -37,8 +37,7 @@ defmodule LiveViewNative.LiveForm.MixProject do
       {:makeup_eex, ">= 0.1.1", only: :dev, runtime: false},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_view, "~> 0.20.4"},
-      # {:live_view_native, "~> 0.3.1"},
-      {:live_view_native, path: "../live_view_native", override: true},
+      {:live_view_native, github: "liveview-native/live_view_native", override: true},
       {:live_view_native_test, github: "liveview-native/live_view_native_test", brach: "main", only: :test}
     ]
   end

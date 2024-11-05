@@ -18,33 +18,33 @@ import SwiftUI
 #if swift(>=5.8)
 @_documentation(visibility: public)
 #endif
-struct LiveSubmitButton<R: RootRegistry>: View {
-    @ObservedElement private var element: ElementNode
-    @LiveContext<R> private var context
-    @Environment(\.formModel) private var formModel
+@LiveElement
+struct LiveButton<Root: RootRegistry>: View {
+    @LiveElementIgnored
+    @Environment(\.formModel)
+    private var formModel
+    
+    private var type: String = "button"
+    
+    @LiveElementIgnored
+    private var overrideType: String? = nil
+    
+    init(type: String? = nil) {
+        self.overrideType = type
+    }
     
     public var body: some View {
-        LiveViewNative.Button<R>(action: submitForm)
-    }
-    
-    private func submitForm() {
-        guard let formModel else { return }
-        Task {
-            do {
-                try await formModel.sendSubmitEvent()
-                doAfterSubmitAction()
-            } catch {
-                // todo: error handling
-            }
-        }
-    }
-    
-    private func doAfterSubmitAction() {
-        switch element.attributeValue(for: "after-submit") {
-        case "clear":
-            formModel?.clear()
+        switch overrideType ?? type {
+        case "submit":
+            LiveViewNative.Button<Root>(action: {
+                Task { try await formModel?.sendSubmitEvent() }
+            })
+        case "reset":
+            LiveViewNative.Button<Root>(action: {
+                formModel?.clear()
+            })
         default:
-            return
+            LiveViewNative.Button<Root>()
         }
     }
 }

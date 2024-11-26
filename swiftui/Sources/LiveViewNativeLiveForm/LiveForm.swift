@@ -71,8 +71,8 @@ struct LiveForm<Root: RootRegistry>: View {
     /// Collects all ``LiveHiddenField`` elements, and sets their values into the form model.
     private func updateHiddenFields() {
         for child in $liveElement.element.depthFirstChildren() {
-            guard case let .element(element) = child.data,
-                  element.tag == "LiveHiddenField",
+            guard case let .nodeElement(element) = child.data(),
+                  element.name.name == "LiveHiddenField",
                   let name = element.attributes.first(where: { $0.name == "name" })?.value,
                   let value = element.attributes.first(where: { $0.name == "value" })?.value
             else { continue }

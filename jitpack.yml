@@ -3,3 +3,4 @@ jdk:
 install:
   - echo "Building LiveForm library"
   - ./jetpack/gradlew -p jetpack assembleRelease
+  - ./jetpack/gradlew -p jetpack publishReleasePublicationToMavenLocal

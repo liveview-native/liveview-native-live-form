@@ -1,0 +1,23 @@
+[versions]
+appcompat = "1.7.0"
+android-gradle-plugin = "8.7.1"
+androidx-compose-bom = "2024.10.00"
+coreKtx = "1.13.1"
+junit = "4.13.2"
+kotlin = "1.9.21"
+lvn-client = "main-SNAPSHOT"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+liveview-client-jetpack = { group = "com.github.liveview-native", name = "liveview-client-jetpack", version.ref = "lvn-client" }
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+

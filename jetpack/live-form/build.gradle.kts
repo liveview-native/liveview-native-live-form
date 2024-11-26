@@ -51,15 +51,14 @@ dependencies {
     testImplementation(libs.junit)
 }
 
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            groupId = Constants.publishGroupId
-            artifactId = Constants.publishArtifactLiveForm
-            version = Constants.publishVersion
-
-            afterEvaluate {
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
                 from(components["release"])
+                groupId = Constants.publishGroupId
+                artifactId = Constants.publishArtifactLiveForm
+                version = Constants.publishVersion
             }
         }
     }

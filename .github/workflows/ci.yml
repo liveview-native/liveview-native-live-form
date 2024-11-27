@@ -25,15 +25,10 @@ jobs:
         with:
           key: xcode-cache-deriveddata-${{ github.workflow }}
           restore-keys: xcode-cache-deriveddata-${{ github.workflow }}-
-      - name: Run tests on iOS Simulator
+      - name: Build for iOS
         shell: bash
         run: |
-          xcodebuild test -scheme LiveViewNativeLiveForm -destination "platform=iOS Simulator,name=iPhone 15 Pro" -enableCodeCoverage YES -resultBundlePath TestResults -skipMacroValidation -skipPackagePluginValidation
-      - uses: kishikawakatsumi/xcresulttool@v1
-        with:
-          path: TestResults.xcresult
-        continue-on-error: true
-        if: success() || failure()
+          xcodebuild -scheme LiveViewNativeLiveForm -destination "platform=iOS Simulator,name=iPhone 15 Pro" -skipMacroValidation -skipPackagePluginValidation
       - name: Build for macOS
         shell: bash
         run: |

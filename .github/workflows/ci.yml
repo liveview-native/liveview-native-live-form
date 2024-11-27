@@ -28,32 +28,21 @@ jobs:
       - name: Run tests on iOS Simulator
         shell: bash
         run: |
-          xcodebuild -scheme BuiltinRegistryGenerator -destination "platform=macOS"
-          xcodebuild test -scheme LiveViewNative-Package -destination "platform=iOS Simulator,name=iPhone 15 Pro" -enableCodeCoverage YES -resultBundlePath TestResults -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild test -scheme LiveViewNativeLiveForm-Package -destination "platform=iOS Simulator,name=iPhone 15 Pro" -enableCodeCoverage YES -resultBundlePath TestResults -skipMacroValidation -skipPackagePluginValidation
       - uses: kishikawakatsumi/xcresulttool@v1
         with:
           path: TestResults.xcresult
         continue-on-error: true
         if: success() || failure()
-      - name: Validate Coverage %
-        shell: bash
-        run: |
-          COVERAGE=$(xcrun xccov view --report --json TestResults.xcresult | jq '([.targets[] | select(.name == "LiveViewNative").files[] | select(.name != "_GeneratedModifiers.swift") | .coveredLines] | add) / ([.targets[] | select(.name == "LiveViewNative").files[] | select(.name != "_GeneratedModifiers.swift") | .executableLines] | add)')
-          if [ $(echo "$COVERAGE > $MIN_COVERAGE" | bc) -ne 1 ]; then
-            printf "Code coverage $COVERAGE does not meet minimum requirement $MIN_COVERAGE"
-            exit -1
-          else
-            printf "Code coverage $COVERAGE meets minimum requirement $MIN_COVERAGE"
-          fi
       - name: Build for macOS
         shell: bash
         run: |
-          xcodebuild -scheme LiveViewNative-Package -destination "platform=macOS" -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild -scheme LiveViewNativeLiveForm-Package -destination "platform=macOS" -skipMacroValidation -skipPackagePluginValidation
       - name: Build for watchOS
         shell: bash
         run: |
-          xcodebuild -scheme LiveViewNative-Package -destination "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)" -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild -scheme LiveViewNativeLiveForm-Package -destination "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)" -skipMacroValidation -skipPackagePluginValidation
       - name: Build for tvOS
         shell: bash
         run: |
-          xcodebuild -scheme LiveViewNative-Package -destination "name=Any tvOS Device" -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild -scheme LiveViewNativeLiveForm-Package -destination "name=Any tvOS Device" -skipMacroValidation -skipPackagePluginValidation

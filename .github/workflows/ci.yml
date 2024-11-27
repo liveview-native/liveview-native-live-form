@@ -28,7 +28,7 @@ jobs:
       - name: Run tests on iOS Simulator
         shell: bash
         run: |
-          xcodebuild test -scheme LiveViewNativeLiveForm-Package -destination "platform=iOS Simulator,name=iPhone 15 Pro" -enableCodeCoverage YES -resultBundlePath TestResults -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild test -scheme LiveViewNativeLiveForm -destination "platform=iOS Simulator,name=iPhone 15 Pro" -enableCodeCoverage YES -resultBundlePath TestResults -skipMacroValidation -skipPackagePluginValidation
       - uses: kishikawakatsumi/xcresulttool@v1
         with:
           path: TestResults.xcresult
@@ -37,12 +37,12 @@ jobs:
       - name: Build for macOS
         shell: bash
         run: |
-          xcodebuild -scheme LiveViewNativeLiveForm-Package -destination "platform=macOS" -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild -scheme LiveViewNativeLiveForm -destination "platform=macOS" -skipMacroValidation -skipPackagePluginValidation
       - name: Build for watchOS
         shell: bash
         run: |
-          xcodebuild -scheme LiveViewNativeLiveForm-Package -destination "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)" -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild -scheme LiveViewNativeLiveForm -destination "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)" -skipMacroValidation -skipPackagePluginValidation
       - name: Build for tvOS
         shell: bash
         run: |
-          xcodebuild -scheme LiveViewNativeLiveForm-Package -destination "name=Any tvOS Device" -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild -scheme LiveViewNativeLiveForm -destination "name=Any tvOS Device" -skipMacroValidation -skipPackagePluginValidation

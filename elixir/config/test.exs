@@ -16,7 +16,7 @@ config :phoenix, template_engines: [
   neex: LiveViewNative.Engine
 ]
 
-config :live_view_native_test,
+config :live_view_native_test_endpoint,
   formats: [:gameboy],
   otp_app: :live_view_native,
   routes: [

@@ -212,7 +212,7 @@ end
       template = ~LVN"""
       <.form :let={f} as={:myform}>
         <.inputs_for :let={finner} field={f[:inner]} } options={[foo: "bar"]}>
-          <Text><%= finner.options[:foo] %></Text>
+          <Text>{finner.options[:foo]}</Text>
         </.inputs_for>
       </.form>
       """

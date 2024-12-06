@@ -183,7 +183,7 @@ defmodule LiveViewNative.LiveForm.Component do
       <%= if @csrf_token do %>
         <LiveHiddenField name="_csrf_token" value={@csrf_token} />
       <% end %>
-      <%= render_slot(@inner_block, @form) %>
+      {render_slot(@inner_block, @form)}
     </LiveForm>
     """
   end
@@ -402,7 +402,7 @@ defmodule LiveViewNative.LiveForm.Component do
           <LiveHiddenField name={name} value={value} />
         <% end %>
       <% end %>
-      <%= render_slot(@inner_block, form) %>
+      {render_slot(@inner_block, form)}
     <% end %>
     """
   end

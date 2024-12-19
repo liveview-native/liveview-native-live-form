@@ -8,6 +8,9 @@
 import LiveViewNative
 import LiveViewNativeStylesheet
 import SwiftUI
+import OSLog
+
+let logger = Logger(subsystem: "LiveViewNative", category: "LiveForm")
 
 public extension Addons {
     /// This registry provides the Live Form elements.
@@ -27,6 +30,7 @@ public extension Addons {
     public struct LiveForm<Root: RootRegistry> {
         public enum TagName: String {
             case liveForm = "LiveForm"
+            case liveButton = "LiveButton"
             case liveSubmitButton = "LiveSubmitButton"
             case liveHiddenField = "LiveHiddenField"
         }
@@ -36,8 +40,11 @@ public extension Addons {
             switch name {
             case .liveForm:
                 LiveViewNativeLiveForm.LiveForm<Root>()
+            case .liveButton:
+                LiveButton<Root>()
             case .liveSubmitButton:
-                LiveSubmitButton<Root>()
+                let _ = logger.warning("`<LiveSubmitButton>` is deprecated. Use `<LiveButton type=\"submit\">` instead.")
+                LiveButton<Root>(type: "submit")
             case .liveHiddenField:
                 LiveHiddenField()
             }

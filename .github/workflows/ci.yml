@@ -40,4 +40,4 @@ jobs:
       - name: Build for tvOS
         shell: bash
         run: |
-          xcodebuild -scheme LiveViewNativeLiveForm -destination "name=tvOS Simulator,name=Apple TV" -skipMacroValidation -skipPackagePluginValidation
+          xcodebuild -scheme LiveViewNativeLiveForm -destination "platform=tvOS Simulator,name=Apple TV" -skipMacroValidation -skipPackagePluginValidation

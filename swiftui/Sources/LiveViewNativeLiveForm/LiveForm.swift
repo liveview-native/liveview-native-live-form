@@ -63,7 +63,8 @@ struct LiveForm<Root: RootRegistry>: View {
             await $liveElement.context.coordinator.session.reconnect(
                 url: url,
                 httpMethod: method,
-                httpBody: body.data(using: .utf8)
+                httpBody: body.data(using: .utf8),
+                headers: ["Content-Type": "application/x-www-form-urlencoded"]
             )
         }
     }

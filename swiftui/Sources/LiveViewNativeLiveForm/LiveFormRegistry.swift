@@ -27,7 +27,7 @@ public extension Addons {
     /// )
     /// ```
     @Addon
-    public struct LiveForm<Root: RootRegistry> {
+    struct LiveForm<Root: RootRegistry> {
         public enum TagName: String {
             case liveForm = "LiveForm"
             case liveButton = "LiveButton"
@@ -36,6 +36,7 @@ public extension Addons {
         }
         
         @ViewBuilder
+        @MainActor
         public static func lookup(_ name: TagName, element: ElementNode) -> some View {
             switch name {
             case .liveForm:

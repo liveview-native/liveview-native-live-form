@@ -78,52 +78,7 @@ defmodule LiveViewNative.LiveForm.Component do
 
   slot(:inner_block, required: true, doc: "The content rendered inside of the form tag.")
 
-  def form(assigns) do
-    # action = assigns[:action]
-
-    # # We require for={...} to be given but we automatically handle nils for convenience
-    # form_for =
-    #   case assigns[:for] do
-    #     nil -> %{}
-    #     other -> other
-    #   end
-
-    # form_options =
-    #   assigns
-    #   |> Map.take([:as, :csrf_token, :errors, :method, :multipart])
-    #   |> Map.merge(assigns.rest)
-    #   |> Map.to_list()
-
-    # # Since FormData may add options, read the actual options from form
-    # %{options: opts} = form = to_form(form_for, form_options)
-
-    # # By default, we will ignore action, method, and csrf token
-    # # unless the action is given.
-    # attrs =
-    #   if action do
-    #     {method, opts} = Keyword.pop(opts, :method)
-    #     {method, _} = form_method(method)
-
-    #     [action: action, method: method] ++ opts
-    #   else
-    #     opts
-    #   end
-
-    # attrs =
-    #   case Keyword.pop(attrs, :multipart, false) do
-    #     {false, attrs} -> attrs
-    #     {true, attrs} -> Keyword.put(attrs, :enctype, "multipart/form-data")
-    #   end
-
-    # require IEx
-    # IEx.pry()
-    # attrs = Keyword.put(attrs, :id, Map.get_lazy(assigns.rest, :id, fn -> form_for.id end))
-
-    # assigns =
-    #   assign(assigns,
-    #     form: form,
-    #     attrs: attrs
-    #   )
+  def form(assigns, _interface) do
     action = assigns[:action]
 
     # We require for={...} to be given but we automatically handle nils for convenience
@@ -353,7 +308,7 @@ defmodule LiveViewNative.LiveForm.Component do
   slot(:inner_block, required: true, doc: "The content rendered for each nested form.")
 
   @persistent_id "_persistent_id"
-  def inputs_for(assigns) do
+  def inputs_for(assigns, _interface) do
     %Phoenix.HTML.FormField{field: field_name, form: parent_form} = assigns.field
     options = assigns |> Map.take([:id, :as, :default, :append, :prepend]) |> Keyword.new()
 

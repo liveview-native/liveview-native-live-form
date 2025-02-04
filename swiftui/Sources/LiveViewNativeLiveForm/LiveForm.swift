@@ -57,14 +57,16 @@ struct LiveForm<Root: RootRegistry>: View {
     private func submitForm() {
         guard let action,
               let url = URL(string: action, relativeTo: $liveElement.context.url),
-              let body = try? formModel.buildFormQuery()
+              let formData = try? formModel.toDictionary()
         else { return }
         Task {
-            await $liveElement.context.coordinator.session.reconnect(
-                url: url,
-                httpMethod: method,
-                httpBody: body.data(using: .utf8)
-            )
+            try? await $liveElement.context.coordinator.session.postFormData(url: url, formData: formData)
+//            await $liveElement.context.coordinator.session.reconnect(
+//                url: url,
+//                httpMethod: method,
+//                httpBody: body.data(using: .utf8),
+//                headers: ["Content-Type": "application/x-www-form-urlencoded"]
+//            )
         }
     }
     

@@ -18,7 +18,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-       .package(url: "https://github.com/liveview-native/liveview-client-swiftui.git", from: "0.4.0-rc.0"),
+       .package(url: "https://github.com/liveview-native/liveview-client-swiftui.git", from: "0.4.0-rc.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

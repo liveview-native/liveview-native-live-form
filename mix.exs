@@ -1,7 +1,7 @@
 defmodule LiveViewNative.LiveForm.MixProject do
   use Mix.Project
 
-  @version "0.4.0-rc.0"
+  @version "0.4.0-rc.1"
   @source_url "https://github.com/liveview-native/liveview-native-live-form"
 
   def project do
@@ -36,8 +36,7 @@ defmodule LiveViewNative.LiveForm.MixProject do
       {:ex_doc, "~> 0.24", only: :dev, runtime: false},
       {:makeup_eex, ">= 0.1.1", only: :dev, runtime: false},
       {:floki, ">= 0.30.0", only: :test},
-      # {:live_view_native, "~> 0.4.0-rc.0"},
-      {:live_view_native, github: "liveview-native/live_view_native"},
+      {:live_view_native, "~> 0.4.0-rc.1"},
       {:live_view_native_test_endpoint, github: "liveview-native/live_view_native_test_endpoint", brach: "main", only: :test}
     ]
   end
